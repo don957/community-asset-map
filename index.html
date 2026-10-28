@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Community Asset Map — Fieldwork Organizer</title>
+<meta name="description" content="A fieldwork organizer for mapping community assets, tracing trust, identifying gaps, and applying the Vision Grid and equity lens.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Public+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+/* ---------- Tokens (NCCSC microcredential brand) ---------- */
+:root{
+  --ink:#16171B;
+  --muted:#6F675F;
+  --line:#D8D0C5;
+  --field-line:#BEB4A8;
+  --soft:#F6F1E9;
+  --white:#FFFFFF;
+  --accent:#F37023;        /* decorative: borders, bars, icons */
+  --accent-strong:#C2510F; /* text and buttons: passes 4.5:1 contrast on white */
+  --accent-soft:#FDE4D3;
+  --focus:#C2510F;
+  --font-body:"Public Sans","Noto Sans",Arial,sans-serif;
+  --font-display:"Archivo Black","Arial Black",Arial,sans-serif;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);font-family:var(--font-body);line-height:1.4}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* ---------- Toolbar ---------- */
+.toolbar{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 14px;padding:10px 20px;background:var(--ink);border-bottom:3px solid var(--accent)}
+.btn{appearance:none;border:2px solid transparent;border-radius:6px;min-height:44px;padding:9px 16px;font:800 13px var(--font-body);letter-spacing:.025em;text-transform:uppercase;cursor:pointer}
+.btn-primary{background:var(--accent-strong);color:#fff}
+.btn-primary:hover{background:#A3440C}
+.btn-secondary{background:transparent;color:#fff;border-color:#fff}
+.btn-secondary:hover{background:rgba(255,255,255,.12)}
+.btn-link{background:transparent;color:#E9E4DD;text-decoration:underline;text-underline-offset:3px;padding:9px 8px}
+.btn-link:hover{color:#fff}
+.toolbar :focus-visible{outline-color:#fff}
+.save-status{margin:0;color:#E9E4DD;font-size:13px;min-width:12em}
+
+/* ---------- Saving help ---------- */
+.save-help{margin:0 0 28px;padding:14px 16px;background:var(--soft);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:6px}
+.save-help h2{font-size:15px;margin:0 0 4px}
+.save-help p{margin:0 0 10px;font-size:13px}
+.save-help dl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0}
+.save-help dt{font-size:12px;font-weight:800}
+.save-help dd{margin:2px 0 0;font-size:12px;color:var(--muted)}
+
+/* ---------- Page ---------- */
+.page{max-width:1120px;margin:28px auto;background:var(--white);padding:42px 46px 52px;border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 28px rgba(22,23,27,.10)}
+header{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:start;padding-bottom:26px;border-bottom:5px solid var(--accent)}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--accent-strong);margin-bottom:8px}
+h1,h2,h3{font-family:var(--font-display);font-weight:400}
+h1{font-size:36px;line-height:1.1;margin:0 0 10px;letter-spacing:-.02em}
+.sub{font-size:16px;color:var(--muted);max-width:700px;margin:0}
+.meta{min-width:230px}
+.meta label{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 4px}
+.line-input{width:100%;border:0;border-bottom:2px solid var(--ink);padding:5px 2px 6px;font:inherit;background:transparent;margin-bottom:12px}
+
+/* ---------- Sections ---------- */
+.section{margin-top:30px}
+.section-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;border-left:5px solid var(--accent);padding-left:12px}
+.num{flex:0 0 34px;height:34px;border-radius:6px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:800;box-shadow:inset 0 -3px 0 var(--accent)}
+.section h2{font-size:21px;margin:1px 0 3px}
+.prompt{font-size:13px;color:var(--muted);margin:0}
+.criterion{margin-left:auto;flex:0 0 auto;background:var(--soft);color:var(--ink);border:1px solid #E8C4AA;border-left:4px solid var(--accent);border-radius:4px;padding:7px 9px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.035em}
+
+/* ---------- Fields ---------- */
+textarea{width:100%;resize:vertical;min-height:76px;border:1px solid var(--field-line);border-radius:4px;padding:9px;font:13px var(--font-body);color:var(--ink);background:#fff}
+select{width:100%;border:1px solid var(--field-line);border-radius:4px;background:#fff;font:12px var(--font-body);color:var(--ink);padding:6px 4px;min-height:34px}
+
+/* ---------- Cards ---------- */
+.grid{display:grid;gap:10px}
+.assets{grid-template-columns:repeat(2,1fr)}
+.card{border:1px solid var(--line);border-radius:6px;padding:14px;background:#fff}
+.card h3{font-size:14px;margin:0 0 4px}
+.card p{font-size:11px;color:var(--muted);margin:0 0 9px}
+.assets .card:nth-child(odd){border-top:4px solid var(--accent)}
+.assets .card:nth-child(even){border-top:4px solid var(--ink)}
+.card-soft{margin-top:10px;background:var(--soft)}
+.card-soft textarea{min-height:120px}
+
+/* ---------- Tables ---------- */
+.table-wrap{overflow-x:auto;border:1px solid #CFC5BA;border-radius:6px}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th{background:var(--ink);color:#fff;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:9px;border-bottom:1px solid #323339}
+td{padding:7px;border-bottom:1px solid #E8E1D8;border-right:1px solid #E8E1D8;vertical-align:top}
+tr:last-child td{border-bottom:0}
+td:last-child{border-right:0}
+td textarea{min-height:38px;border:0;background:transparent;font-size:12px;padding:3px}
+td select{border-color:#E1D9CE}
+.row-label{font-size:12px;font-weight:700}
+.gaps td:first-child{width:34px;text-align:center;font-weight:800;color:var(--accent-strong)}
+.equity-table{margin-top:10px}
+
+/* ---------- Trust flow ---------- */
+.flow{display:grid;grid-template-columns:1fr 56px 1fr 56px 1fr;align-items:stretch;gap:8px}
+.flowbox{border:1px solid var(--line);border-radius:6px;padding:13px;background:var(--soft)}
+.flowbox h3{font-size:13px;margin:0 0 7px}
+.flowbox textarea{min-height:92px;font-size:12px}
+.arrow{display:grid;place-items:center;color:var(--accent);font-size:25px;font-weight:800;text-align:center}
+.arrow small{display:block;font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase;line-height:1.15;margin-top:3px}
+
+/* ---------- Equity ---------- */
+.equity{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.equity .card{background:var(--soft)}
+.equity .card:first-child{border-top:5px solid var(--accent)}
+.equity .card:last-child{border-top:5px solid var(--ink)}
+
+/* ---------- Rubric ---------- */
+.rubric{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.level{border:1px solid var(--line);border-radius:6px;padding:14px;background:var(--soft)}
+.level h3{margin:0 0 8px;font-size:14px}
+.level ul{padding-left:18px;margin:0 0 12px;font-size:12px;color:#53504C}
+.level textarea{min-height:62px;font-size:12px}
+.level.emerging{border-top:5px solid var(--muted)}
+.level.maturing{border-top:5px solid var(--accent)}
+.level.transforming{border-top:5px solid var(--ink)}
+.checks{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}
+.check{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:9px 10px;font-size:12px;cursor:pointer}
+.check input{margin-top:2px;accent-color:var(--accent-strong)}
+
+/* ---------- Footer ---------- */
+footer{margin-top:30px;padding-top:18px;border-top:4px solid var(--accent);display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:11px}
+.tag{color:var(--accent-strong);font-weight:800}
+
+/* ---------- Mobile ---------- */
+@media (max-width:760px){
+  .toolbar{padding:10px 14px}
+  .page{margin:0;border:0;border-radius:0;box-shadow:none;padding:26px 16px}
+  header{grid-template-columns:1fr}
+  .meta{min-width:0}
+  .assets,.equity,.rubric,.checks,.flow,.save-help dl{grid-template-columns:1fr}
+  .arrow{transform:rotate(90deg);height:38px}
+  .criterion{display:none}
+  h1{font-size:29px}
+  footer{flex-direction:column}
+}
+
+/* ---------- Print (Letter, multi-page) ---------- */
+@page{size:letter;margin:.5in}
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body{background:#fff;font-size:10pt}
+  .toolbar,.save-help{display:none!important}
+  .page{max-width:none;margin:0;border:0;border-radius:0;box-shadow:none;padding:0}
+  header{padding-bottom:14px}
+  h1{font-size:26pt}
+  .section{margin-top:18px}
+  .section-head{break-after:avoid}
+  .card,.flowbox,.level,.check,tr{break-inside:avoid}
+  .table-wrap{overflow:visible}
+  table{min-width:0}
+  th{font-size:8pt;padding:6px}
+  td{padding:4px}
+  textarea{resize:none;overflow:hidden}
+  .criterion{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar" role="region" aria-label="Organizer controls">
+  <button type="button" class="btn btn-primary" id="print-btn">Print / Save as PDF</button>
+  <button type="button" class="btn btn-secondary" id="download-btn">Download my work</button>
+  <button type="button" class="btn btn-secondary" id="load-btn">Load my work</button>
+  <input type="file" id="load-file" accept=".json,application/json" hidden>
+  <button type="button" class="btn btn-link" id="clear-btn">Clear form</button>
+  <p class="save-status" id="save-status" role="status" aria-live="polite">Responses save in this browser</p>
+</div>
+
+<main class="page">
+<aside class="save-help" aria-labelledby="save-help-title">
+  <h2 id="save-help-title">Saving your work</h2>
+  <p>Your answers save automatically in this browser. To be safe, download a copy before you close the page.</p>
+  <dl>
+    <div><dt>Download my work</dt><dd>Saves a small file to your computer. Use it as a backup or to keep working somewhere else.</dd></div>
+    <div><dt>Load my work</dt><dd>Opens that file on any device or browser and picks up where you left off.</dd></div>
+    <div><dt>Print / Save as PDF</dt><dd>Makes a finished copy to submit or share. A PDF can’t be loaded back in.</dd></div>
+    <div><dt>Clear form</dt><dd>Erases everything. On a shared computer, download your work first, then clear.</dd></div>
+  </dl>
+</aside>
+<header>
+  <div>
+    <div class="eyebrow">Microcredential #2 · Understand the Community</div>
+    <h1>Community Asset Map</h1>
+    <p class="sub">A fieldwork organizer for mapping assets, tracing trust, identifying gaps, and applying the Vision Grid and equity lens.</p>
+  </div>
+  <div class="meta">
+    <label for="school">School / Community</label><input id="school" type="text" class="line-input">
+    <label for="mappers">Mapper(s)</label><input id="mappers" type="text" class="line-input">
+    <label for="version">Date / Version</label><input id="version" type="text" class="line-input">
+  </div>
+</header>
+
+<!-- 1 -->
+<section class="section" aria-labelledby="s1">
+  <div class="section-head"><div class="num" aria-hidden="true">1</div><div><h2 id="s1">Scan the full asset landscape</h2><p class="prompt">Name formal and informal assets. Include people, groups, institutions, businesses, networks, spaces, and natural gathering places.</p></div><div class="criterion">Rubric · Mapping the Assets</div></div>
+  <div class="grid assets">
+    <div class="card"><h3 id="a1">Formal organizations</h3><p id="a1d">Schools, nonprofits, agencies, health providers, libraries, faith communities, cultural institutions</p><textarea aria-labelledby="a1" aria-describedby="a1d"></textarea></div>
+    <div class="card"><h3 id="a2">Informal networks &amp; wisdom</h3><p id="a2d">Elders, healers, mutual aid, parent connectors, neighborhood leaders, cultural knowledge keepers</p><textarea aria-labelledby="a2" aria-describedby="a2d"></textarea></div>
+    <div class="card"><h3 id="a3">Businesses &amp; resources</h3><p id="a3d">Local employers, shops, service providers, funders, transportation, food and technology resources</p><textarea aria-labelledby="a3" aria-describedby="a3d"></textarea></div>
+    <div class="card"><h3 id="a4">Youth &amp; gathering spaces</h3><p id="a4d">Youth groups, parks, recreation, community rooms, trusted online spaces, and natural gathering places</p><textarea aria-labelledby="a4" aria-describedby="a4d"></textarea></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="section" aria-labelledby="s2">
+  <div class="section-head"><div class="num" aria-hidden="true">2</div><div><h2 id="s2">Build the asset inventory</h2><p class="prompt">Record what each asset contributes, who trusts it, and the Vision Grid pillar it most naturally serves.</p></div><div class="criterion">Rubric · Mapping + Vision Grid</div></div>
+  <div class="table-wrap"><table>
+    <thead><tr><th scope="col">Asset / Contact</th><th scope="col">Type</th><th scope="col">Strengths &amp; resources</th><th scope="col">Who trusts / uses it?</th><th scope="col">Primary pillar</th><th scope="col">School connection now</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><textarea aria-label="Asset 1: name or contact"></textarea></td>
+        <td><select aria-label="Asset 1: type"><option value=""></option><option>Formal organization</option><option>Informal network</option><option>Business</option><option>Faith / cultural</option><option>Youth space</option><option>Natural gathering place</option><option>Individual / elder / healer</option></select></td>
+        <td><textarea aria-label="Asset 1: strengths and resources"></textarea></td>
+        <td><textarea aria-label="Asset 1: who trusts or uses it"></textarea></td>
+        <td><select aria-label="Asset 1: primary pillar"><option value=""></option><option>Integrated Supports</option><option>Extended Learning</option><option>Family &amp; Community Engagement</option><option>Collaborative Leadership</option></select></td>
+        <td><select aria-label="Asset 1: school connection now"><option value=""></option><option>Strong</option><option>Emerging</option><option>Transactional</option><option>Broken / strained</option><option>None</option></select></td>
+      </tr>
+      <tr>
+        <td><textarea aria-label="Asset 2: name or contact"></textarea></td>
+        <td><select aria-label="Asset 2: type"><option value=""></option><option>Formal organization</option><option>Informal network</option><option>Business</option><option>Faith / cultural</option><option>Youth space</option><option>Natural gathering place</option><option>Individual / elder / healer</option></select></td>
+        <td><textarea aria-label="Asset 2: strengths and resources"></textarea></td>
+        <td><textarea aria-label="Asset 2: who trusts or uses it"></textarea></td>
+        <td><select aria-label="Asset 2: primary pillar"><option value=""></option><option>Integrated Supports</option><option>Extended Learning</option><option>Family &amp; Community Engagement</option><option>Collaborative Leadership</option></select></td>
+        <td><select aria-label="Asset 2: school connection now"><option value=""></option><option>Strong</option><option>Emerging</option><option>Transactional</option><option>Broken / strained</option><option>None</option></select></td>
+      </tr>
+      <tr>
+        <td><textarea aria-label="Asset 3: name or contact"></textarea></td>
+        <td><select aria-label="Asset 3: type"><option value=""></option><option>Formal organization</option><option>Informal network</option><option>Business</option><option>Faith / cultural</option><option>Youth space</option><option>Natural gathering place</option><option>Individual / elder / healer</option></select></td>
+        <td><textarea aria-label="Asset 3: strengths and resources"></textarea></td>
+        <td><textarea aria-label="Asset 3: who trusts or uses it"></textarea></td>
+        <td><select aria-label="Asset 3: primary pillar"><option value=""></option><option>Integrated Supports</option><option>Extended Learning</option><option>Family &amp; Community Engagement</option><option>Collaborative Leadership</option></select></td>
+        <td><select aria-label="Asset 3: school connection now"><option value=""></option><option>Strong</option><option>Emerging</option><option>Transactional</option><option>Broken / strained</option><option>None</option></select></td>
+      </tr>
+      <tr>
+        <td><textarea aria-label="Asset 4: name or contact"></textarea></td>
+        <td><select aria-label="Asset 4: type"><option value=""></option><option>Formal organization</option><option>Informal network</option><option>Business</option><option>Faith / cultural</option><option>Youth space</option><option>Natural gathering place</option><option>Individual / elder / healer</option></select></td>
+        <td><textarea aria-label="Asset 4: strengths and resources"></textarea></td>
+        <td><textarea aria-label="Asset 4: who trusts or uses it"></textarea></td>
+        <td><select aria-label="Asset 4: primary pillar"><option value=""></option><option>Integrated Supports</option><option>Extended Learning</option><option>Family &amp; Community Engagement</option><option>Collaborative Leadership</option></select></td>
+        <td><select aria-label="Asset 4: school connection now"><option value=""></option><option>Strong</option><option>Emerging</option><option>Transactional</option><option>Broken / strained</option><option>None</option></select></td>
+      </tr>
+      <tr>
+        <td><textarea aria-label="Asset 5: name or contact"></textarea></td>
+        <td><select aria-label="Asset 5: type"><option value=""></option><option>Formal organization</option><option>Informal network</option><option>Business</option><option>Faith / cultural</option><option>Youth space</option><option>Natural gathering place</option><option>Individual / elder / healer</option></select></td>
+        <td><textarea aria-label="Asset 5: strengths and resources"></textarea></td>
+        <td><textarea aria-label="Asset 5: who trusts or uses it"></textarea></td>
+        <td><select aria-label="Asset 5: primary pillar"><option value=""></option><option>Integrated Supports</option><option>Extended Learning</option><option>Family &amp; Community Engagement</option><option>Collaborative Leadership</option></select></td>
+        <td><select aria-label="Asset 5: school connection now"><option value=""></option><option>Strong</option><option>Emerging</option><option>Transactional</option><option>Broken / strained</option><option>None</option></select></td>
+      </tr>
+      <tr>
+        <td><textarea aria-label="Asset 6: name or contact"></textarea></td>
+        <td><select aria-label="Asset 6: type"><option value=""></option><option>Formal organization</option><option>Informal network</option><option>Business</option><option>Faith / cultural</option><option>Youth space</option><option>Natural gathering place</option><option>Individual / elder / healer</option></select></td>
+        <td><textarea aria-label="Asset 6: strengths and resources"></textarea></td>
+        <td><textarea aria-label="Asset 6: who trusts or uses it"></textarea></td>
+        <td><select aria-label="Asset 6: primary pillar"><option value=""></option><option>Integrated Supports</option><option>Extended Learning</option><option>Family &amp; Community Engagement</option><option>Collaborative Leadership</option></select></td>
+        <td><select aria-label="Asset 6: school connection now"><option value=""></option><option>Strong</option><option>Emerging</option><option>Transactional</option><option>Broken / strained</option><option>None</option></select></td>
+      </tr>
+      <tr>
+        <td><textarea aria-label="Asset 7: name or contact"></textarea></td>
+        <td><select aria-label="Asset 7: type"><option value=""></option><option>Formal organization</option><option>Informal network</option><option>Business</option><option>Faith / cultural</option><option>Youth space</option><option>Natural gathering place</option><option>Individual / elder / healer</option></select></td>
+        <td><textarea aria-label="Asset 7: strengths and resources"></textarea></td>
+        <td><textarea aria-label="Asset 7: who trusts or uses it"></textarea></td>
+        <td><select aria-label="Asset 7: primary pillar"><option value=""></option><option>Integrated Supports</option><option>Extended Learning</option><option>Family &amp; Community Engagement</option><option>Collaborative Leadership</option></select></td>
+        <td><select aria-label="Asset 7: school connection now"><option value=""></option><option>Strong</option><option>Emerging</option><option>Transactional</option><option>Broken / strained</option><option>None</option></select></td>
+      </tr>
+      <tr>
+        <td><textarea aria-label="Asset 8: name or contact"></textarea></td>
+        <td><select aria-label="Asset 8: type"><option value=""></option><option>Formal organization</option><option>Informal network</option><option>Business</option><option>Faith / cultural</option><option>Youth space</option><option>Natural gathering place</option><option>Individual / elder / healer</option></select></td>
+        <td><textarea aria-label="Asset 8: strengths and resources"></textarea></td>
+        <td><textarea aria-label="Asset 8: who trusts or uses it"></textarea></td>
+        <td><select aria-label="Asset 8: primary pillar"><option value=""></option><option>Integrated Supports</option><option>Extended Learning</option><option>Family &amp; Community Engagement</option><option>Collaborative Leadership</option></select></td>
+        <td><select aria-label="Asset 8: school connection now"><option value=""></option><option>Strong</option><option>Emerging</option><option>Transactional</option><option>Broken / strained</option><option>None</option></select></td>
+      </tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 3 -->
+<section class="section" aria-labelledby="s3">
+  <div class="section-head"><div class="num" aria-hidden="true">3</div><div><h2 id="s3">Trace how trust and connection flow</h2><p class="prompt">Go beyond a directory. Use specific relationships, connectors, histories, and barriers.</p></div><div class="criterion">Rubric · Transforming Evidence</div></div>
+  <div class="flow">
+    <div class="flowbox"><h3 id="f1">Where trust lives</h3><textarea aria-labelledby="f1" placeholder="People, places, and relationships community members already trust…"></textarea></div>
+    <div class="arrow" aria-hidden="true"><span>→<small>through</small></span></div>
+    <div class="flowbox"><h3 id="f2">Key connectors</h3><textarea aria-labelledby="f2" placeholder="Who bridges groups, shares information, or opens doors?…"></textarea></div>
+    <div class="arrow" aria-hidden="true"><span>→<small>toward</small></span></div>
+    <div class="flowbox"><h3 id="f3">School relationship</h3><textarea aria-labelledby="f3" placeholder="Strong ties, weak ties, broken trust, or missing connections…"></textarea></div>
+  </div>
+  <div class="card card-soft"><h3 id="f4">Connection map notes</h3><p id="f4d">Sketch or describe who is connected to whom. Mark strong ties, weak ties, broken ties, and potential bridges.</p><textarea aria-labelledby="f4" aria-describedby="f4d"></textarea></div>
+</section>
+
+<!-- 4 -->
+<section class="section" aria-labelledby="s4">
+  <div class="section-head"><div class="num" aria-hidden="true">4</div><div><h2 id="s4">Investigate at least five disconnected assets</h2><p class="prompt">Name why each relationship is absent and define a trust-building first move—not just an outreach task.</p></div><div class="criterion">Rubric · Gaps &amp; Reflection</div></div>
+  <div class="table-wrap"><table class="gaps">
+    <thead><tr><th scope="col">#</th><th scope="col">Disconnected asset</th><th scope="col">Why disconnected?</th><th scope="col">Whose perspective confirms this?</th><th scope="col">Trust-building first move</th><th scope="col">What would progress look like?</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><textarea aria-label="Gap 1: disconnected asset"></textarea></td><td><textarea aria-label="Gap 1: why disconnected"></textarea></td><td><textarea aria-label="Gap 1: whose perspective confirms this"></textarea></td><td><textarea aria-label="Gap 1: trust-building first move"></textarea></td><td><textarea aria-label="Gap 1: what progress would look like"></textarea></td></tr>
+      <tr><td>2</td><td><textarea aria-label="Gap 2: disconnected asset"></textarea></td><td><textarea aria-label="Gap 2: why disconnected"></textarea></td><td><textarea aria-label="Gap 2: whose perspective confirms this"></textarea></td><td><textarea aria-label="Gap 2: trust-building first move"></textarea></td><td><textarea aria-label="Gap 2: what progress would look like"></textarea></td></tr>
+      <tr><td>3</td><td><textarea aria-label="Gap 3: disconnected asset"></textarea></td><td><textarea aria-label="Gap 3: why disconnected"></textarea></td><td><textarea aria-label="Gap 3: whose perspective confirms this"></textarea></td><td><textarea aria-label="Gap 3: trust-building first move"></textarea></td><td><textarea aria-label="Gap 3: what progress would look like"></textarea></td></tr>
+      <tr><td>4</td><td><textarea aria-label="Gap 4: disconnected asset"></textarea></td><td><textarea aria-label="Gap 4: why disconnected"></textarea></td><td><textarea aria-label="Gap 4: whose perspective confirms this"></textarea></td><td><textarea aria-label="Gap 4: trust-building first move"></textarea></td><td><textarea aria-label="Gap 4: what progress would look like"></textarea></td></tr>
+      <tr><td>5</td><td><textarea aria-label="Gap 5: disconnected asset"></textarea></td><td><textarea aria-label="Gap 5: why disconnected"></textarea></td><td><textarea aria-label="Gap 5: whose perspective confirms this"></textarea></td><td><textarea aria-label="Gap 5: trust-building first move"></textarea></td><td><textarea aria-label="Gap 5: what progress would look like"></textarea></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 5 -->
+<section class="section" aria-labelledby="s5">
+  <div class="section-head"><div class="num" aria-hidden="true">5</div><div><h2 id="s5">Apply the equity lens</h2><p class="prompt">Center underserved populations, language access, accessibility, and rural/low-income context throughout—not as an add-on.</p></div><div class="criterion">Rubric · Vision Grid &amp; Equity</div></div>
+  <div class="equity">
+    <div class="card"><h3 id="e1">Whose assets or knowledge may be overlooked?</h3><p id="e1d">Consider power, language, disability, geography, income, race/ethnicity, immigration status, age, and historic exclusion.</p><textarea aria-labelledby="e1" aria-describedby="e1d"></textarea></div>
+    <div class="card"><h3 id="e2">How will community members shape and validate the map?</h3><p id="e2d">Identify who will review it, how participation will be accessible, and how community knowledge will be credited.</p><textarea aria-labelledby="e2" aria-describedby="e2d"></textarea></div>
+  </div>
+  <div class="table-wrap equity-table"><table>
+    <thead><tr><th scope="col">Equity practice</th><th scope="col">Current evidence</th><th scope="col">Gap</th><th scope="col">Next action</th></tr></thead>
+    <tbody>
+      <tr><th scope="row" class="row-label">Language access</th><td><textarea aria-label="Language access: current evidence"></textarea></td><td><textarea aria-label="Language access: gap"></textarea></td><td><textarea aria-label="Language access: next action"></textarea></td></tr>
+      <tr><th scope="row" class="row-label">Accessibility provisions</th><td><textarea aria-label="Accessibility provisions: current evidence"></textarea></td><td><textarea aria-label="Accessibility provisions: gap"></textarea></td><td><textarea aria-label="Accessibility provisions: next action"></textarea></td></tr>
+      <tr><th scope="row" class="row-label">Rural &amp; low-income (RLIS) lens</th><td><textarea aria-label="Rural and low-income lens: current evidence"></textarea></td><td><textarea aria-label="Rural and low-income lens: gap"></textarea></td><td><textarea aria-label="Rural and low-income lens: next action"></textarea></td></tr>
+      <tr><th scope="row" class="row-label">Shared ownership &amp; voice</th><td><textarea aria-label="Shared ownership and voice: current evidence"></textarea></td><td><textarea aria-label="Shared ownership and voice: gap"></textarea></td><td><textarea aria-label="Shared ownership and voice: next action"></textarea></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 6 -->
+<section class="section" aria-labelledby="s6">
+  <div class="section-head"><div class="num" aria-hidden="true">6</div><div><h2 id="s6">Rubric alignment &amp; evidence check</h2><p class="prompt">Use the rubric language to assess the strength of your final map and identify the next revision.</p></div><div class="criterion">Assessment Readiness</div></div>
+  <div class="rubric">
+    <div class="level emerging"><h3 id="r1">Emerging</h3><ul><li>A few obvious, formal organizations</li><li>Few or no disconnected assets named</li><li>Limited pillar or equity connection</li></ul><textarea aria-label="Emerging: evidence or revision needed" placeholder="Evidence / revision needed…"></textarea></div>
+    <div class="level maturing"><h3 id="r2">Maturing</h3><ul><li>Formal and informal assets across many types</li><li>Five or more disconnected assets</li><li>Assets read against all four pillars</li></ul><textarea aria-label="Maturing: evidence or revision needed" placeholder="Evidence / revision needed…"></textarea></div>
+    <div class="level transforming"><h3 id="r3">Transforming</h3><ul><li>Full landscape plus trust and connection flows</li><li>Root causes and trust-building moves surfaced</li><li>Pillars and equity centered throughout</li></ul><textarea aria-label="Transforming: evidence or revision needed" placeholder="Evidence / revision needed…"></textarea></div>
+  </div>
+  <fieldset class="checks" style="border:0;padding:0;margin:12px 0 0">
+    <legend class="prompt" style="padding:0;margin-bottom:8px;grid-column:1/-1">Evidence checklist</legend>
+    <label class="check"><input type="checkbox">I included both formal and informal assets.</label>
+    <label class="check"><input type="checkbox">I showed who is connected to whom.</label>
+    <label class="check"><input type="checkbox">I marked where trust is strong, weak, or broken.</label>
+    <label class="check"><input type="checkbox">I investigated at least five disconnected assets.</label>
+    <label class="check"><input type="checkbox">I named root causes and trust-building moves.</label>
+    <label class="check"><input type="checkbox">Each asset has a primary Vision Grid pillar.</label>
+    <label class="check"><input type="checkbox">Language, accessibility, and RLIS are addressed.</label>
+    <label class="check"><input type="checkbox">Community members will validate and co-own the map.</label>
+  </fieldset>
+</section>
+
+<footer>
+  <span><span class="tag">Fieldwork principle:</span> Build the map <b>with</b> community members, not <b>about</b> them.</span>
+  <span>Community Asset Map · Rubric-aligned organizer</span>
+</footer>
+</main>
+
+<script>
+(function () {
+  // Bump the version if you add, remove, or reorder fields, so old saves don't land in the wrong boxes.
+  var STORAGE_KEY = 'community-asset-map:v1';
+  var main = document.querySelector('main');
+  var status = document.getElementById('save-status');
+  var saveTimer;
+
+  function fields() {
+    return Array.prototype.slice.call(main.querySelectorAll('input, textarea, select'));
+  }
+
+  function grow(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.max(el.scrollHeight + 2, 38) + 'px';
+  }
+
+  function growAll() {
+    main.querySelectorAll('textarea').forEach(grow);
+  }
+
+  function save() {
+    try {
+      var data = fields().map(function (el) {
+        return el.type === 'checkbox' ? el.checked : el.value;
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      status.textContent = 'Saved in this browser';
+    } catch (e) {
+      status.textContent = 'Autosave is off in this browser — print to keep your work';
+    }
+  }
+
+  function apply(data) {
+    fields().forEach(function (el, i) {
+      if (data[i] === undefined) return;
+      if (el.type === 'checkbox') el.checked = !!data[i];
+      else el.value = data[i];
+    });
+  }
+
+  function hasWork() {
+    return fields().some(function (el) {
+      return el.type === 'checkbox' ? el.checked : el.value.trim() !== '';
+    });
+  }
+
+  function restore() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      apply(JSON.parse(raw));
+      status.textContent = 'Restored your saved responses';
+    } catch (e) { /* storage blocked or corrupt: start blank */ }
+  }
+
+  // ---------- Download / load a work file ----------
+  var FILE_APP = 'community-asset-map';
+  var FILE_VERSION = 1;
+
+  function slug(text) {
+    return (text || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+  }
+
+  function downloadWork() {
+    var payload = {
+      app: FILE_APP,
+      version: FILE_VERSION,
+      savedAt: new Date().toISOString(),
+      fieldCount: fields().length,
+      fields: fields().map(function (el) { return el.type === 'checkbox' ? el.checked : el.value; })
+    };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var today = new Date().toISOString().slice(0, 10);
+    var school = slug(document.getElementById('school').value);
+    var name = 'asset-map' + (school ? '-' + school : '') + '-' + today + '.json';
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = name;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+    status.textContent = 'Downloaded ' + name;
+  }
+
+  function loadWork(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var payload;
+      try { payload = JSON.parse(reader.result); } catch (e) { payload = null; }
+      if (!payload || payload.app !== FILE_APP || !Array.isArray(payload.fields)) {
+        alert('This file isn’t a saved Community Asset Map. Choose the .json file you got from “Download my work.”');
+        return;
+      }
+      if (payload.version !== FILE_VERSION || payload.fieldCount !== fields().length) {
+        if (!confirm('This file came from a different version of the organizer, so some answers may land in the wrong boxes. Load it anyway?')) return;
+      }
+      if (hasWork() && !confirm('Replace everything currently on this page with the work in this file?')) return;
+      apply(payload.fields);
+      growAll();
+      save();
+      var when = payload.savedAt ? new Date(payload.savedAt).toLocaleDateString() : '';
+      status.textContent = 'Loaded work' + (when ? ' saved ' + when : '');
+    };
+    reader.onerror = function () { alert('That file couldn’t be read. Please try again.'); };
+    reader.readAsText(file);
+  }
+
+  var fileInput = document.getElementById('load-file');
+  document.getElementById('download-btn').addEventListener('click', downloadWork);
+  document.getElementById('load-btn').addEventListener('click', function () { fileInput.click(); });
+  fileInput.addEventListener('change', function () {
+    if (fileInput.files && fileInput.files[0]) loadWork(fileInput.files[0]);
+    fileInput.value = ''; // allow loading the same file twice
+  });
+
+  function clearAll() {
+    if (!confirm('Clear every response on this organizer? This can’t be undone.')) return;
+    fields().forEach(function (el) {
+      if (el.type === 'checkbox') el.checked = false;
+      else el.value = '';
+    });
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    growAll();
+    status.textContent = 'Form cleared';
+  }
+
+  main.addEventListener('input', function (e) {
+    if (e.target.tagName === 'TEXTAREA') grow(e.target);
+    status.textContent = 'Saving…';
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(save, 400);
+  });
+
+  document.getElementById('print-btn').addEventListener('click', function () { window.print(); });
+  document.getElementById('clear-btn').addEventListener('click', clearAll);
+  window.addEventListener('beforeprint', growAll);
+
+  restore();
+  growAll();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(growAll);
+})();
+</script>
+</body>
+</html>
